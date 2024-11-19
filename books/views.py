@@ -1,21 +1,54 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import Book
 from .serializers import BookSerializer
 
-from rest_framework import generics
+from rest_framework import generics, status
 
 
-class BookListApiView(generics.ListAPIView):
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
+# class BookListApiView(generics.ListAPIView):
+#     queryset = Book.objects.all()
+#     serializer_class = BookSerializer
+
+class BookListApiView(APIView):
+
+    def get(self, request):
+        books = Book.objects.all()
+        # print(books)
+        serializer_data = BookSerializer(books, many=True).data
+        data = {
+            'status':f"Returned {len(books)} books",
+            'books' : serializer_data
+        }
+
+        return Response(data)
 
 
 class BookDetailApiView(generics.RetrieveAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
 
+
+class BookDetailApiView(APIView):
+
+    def get(self, request, pk):
+        try:
+            book = Book.objects.get(id=pk)
+            serializer_data = BookSerializer(book).data
+
+            data = {
+                'status':"Successfull",
+                'book' : serializer_data
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception:
+            return Response(
+                {"status" : "False",
+                 "message" : "Book is not found"}, status=status.HTTP_404_NOT_FOUND
+
+            )
 
 class BookDeleteApiView(generics.DestroyAPIView):
     queryset = Book.objects.all()
@@ -27,9 +60,27 @@ class BookUpdateApiView(generics.UpdateAPIView):
     serializer_class = BookSerializer
 
 
-class BookCreateApiView(generics.CreateAPIView):
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
+# class BookCreateApiView(generics.CreateAPIView):
+#     queryset = Book.objects.all()
+#     serializer_class = BookSerializer
+
+
+class BookCreateApiView(APIView):
+
+    def post(self, request):
+        data = request.data
+        serializer = BookSerializer(data=data)
+        if serializer.is_valid(raise_exception=True):
+            books = serializer.save()
+            data = {'status': f"Books are saved to the database",
+                    'books' : data
+                    }
+            return Response(data)
+        # else:
+        #     return Response(
+        #         {"status": False,
+        #          "message": "Serializer is not valid"}, status=status.HTTP_404_NOT_FOUND
+        #     )
 
 
 class BookListCreateApiView(generics.ListCreateAPIView):
