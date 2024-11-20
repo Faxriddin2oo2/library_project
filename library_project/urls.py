@@ -25,7 +25,7 @@ urlpatterns = [
     path('api/v1/', include('books.urls')),
     path('api-auth/', include('rest_framework.urls')),
     path('api/v1/dj-rest-auth/', include('dj_rest_auth.urls')),
-
+    path('api/v1/dj-rest-auth/registration/', include('dj_rest_auth.registration.urls')),
 
 # swagger
     path('swagger/', schema_view.with_ui(
