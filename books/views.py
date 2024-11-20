@@ -1,12 +1,14 @@
+from docs.conf import author
 from rest_framework.generics import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
 from .models import Book
 from .serializers import BookSerializer
 
-from rest_framework import generics, status
+from rest_framework import generics, status, viewsets
 
 
 # class BookListApiView(generics.ListAPIView):
@@ -122,6 +124,13 @@ class BookListCreateApiView(generics.ListCreateAPIView):
 class BookUpdateDeleteApiView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+
+
+class BookViewset(ModelViewSet):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+    # crud -> uchun judaham mos keladi
 
 # Function based view in DRF
 @api_view(['GET'])
